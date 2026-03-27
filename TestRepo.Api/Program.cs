@@ -8,6 +8,7 @@ using CategoryService = TetPee.Service.Category;
 using UserService = TetPee.Service.User;
 using IdentityService = TetPee.Service.Identity;
 using SellerService = TetPee.Service.Seller;
+using ProductService = TetPee.Service.Product;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -28,6 +29,7 @@ builder.Services.AddJwtServices(builder.Configuration);
 
 
 builder.Services.AddSwaggerServices();
+builder.Services.AddScoped<ProductService.IService, ProductService.Service>();
 builder.Services.AddScoped<SellerService.IService, SellerService.Service>();
 builder.Services.AddScoped<UserService.IService, UserService.Service>();
 builder.Services.AddScoped<JwtService.IService, JwtService.Service>();

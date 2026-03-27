@@ -9,6 +9,7 @@ public class Product: BaseEntity<Guid>, IAuditableEntity
     
     public Seller Seller { get; set; }
     public Guid SellerId { get; set; }
+    public ICollection<ProductCategory> ProductCategories { get; set; } = new  List<ProductCategory>();
     
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset? UpdatedAt { get; set; }
