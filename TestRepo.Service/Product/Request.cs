@@ -7,6 +7,6 @@ public class Request
         public string Name { get; set; }
         public decimal Price { get; set; }
         public Guid SellerId { get; set; }
-        public List<Guid> CategoryId { get; set; } 
+        public List<Guid>? CategoryIds { get; set; } 
     }
 }

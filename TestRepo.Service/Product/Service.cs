@@ -12,40 +12,38 @@ public class Service: IService
     }
     public async Task<string> CreateProduct(Request.ProductRequest productRequest)
     {
-        var nameQuery = _dbContext.Products.Where
-            (x => x.Name.Trim().ToLower() == productRequest.Name.Trim().ToLower());
-        var existName = await nameQuery.AnyAsync();
-        if (existName)
-        {   
-            throw new Exception("Product name already exists");
-        }
-        var sellerQuery = _dbContext.Products.Where(x => x.SellerId == productRequest.SellerId);
-        var exitSeller = await sellerQuery.AnyAsync();
-        if (!exitSeller)
-        {
-            throw new Exception("Seller not found");
-        }
+       var nameProductQuery = _dbContext.Products.Where(x => x.Name == productRequest.Name);
+       var existName = await nameProductQuery.AnyAsync();
+       if (existName)
+       {
+           throw new Exception("Product name already exists");
+       }
+       var sellerQuery = _dbContext.Sellers.Where(x =>x.Id == productRequest.SellerId);
+       var existSeller = await sellerQuery.AnyAsync();
+       if (!existSeller)
+       {
+           throw new Exception("Seller not found");
+       }
 
-        var newProduct = new Repository.Entity.Product()
-        {
-            Name = productRequest.Name,
-            SellerId = productRequest.SellerId,
-            Price = productRequest.Price,
-        };
-        _dbContext.Add(newProduct);
-        await _dbContext.SaveChangesAsync();
-        if (productRequest.CategoryId != null && productRequest.CategoryId.Count > 0)
-        {
-            var productCateList = productRequest.CategoryId.Select(x => new Repository.Entity.ProductCategory()
-            {
-                CategoryId = x,
-                ProductId = newProduct.Id
-            });
-            _dbContext.AddRange(productCateList);
-            await _dbContext.SaveChangesAsync();
-        }
-
-        return Response.Message.Created;
+       var newProduct = new Repository.Entity.Product()
+       {
+           Name = productRequest.Name,
+           Price = productRequest.Price,
+           SellerId = productRequest.SellerId
+       };
+       _dbContext.Add(newProduct);
+       await _dbContext.SaveChangesAsync();
+       if (productRequest.CategoryIds != null && productRequest.CategoryIds.Count > 0)
+       {
+           var productCateList = productRequest.CategoryIds.Select(x => new Repository.Entity.ProductCategory()
+           {
+               CategoryId = x,
+               ProductId = newProduct.Id
+           });
+           _dbContext.AddRange(productCateList);
+           await _dbContext.SaveChangesAsync();
+       }
+       return Response.Message.Created;
     }
 
     public Task<string> UpdateProduct(Request.ProductRequest productRequest)
