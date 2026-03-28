@@ -12,29 +12,31 @@ public class Service: IService
     }
     public async Task<string> CreateProduct(Request.ProductRequest productRequest)
     {
-        var nameQuery =  _dbContext.Products.Where(x => x.Name == productRequest.Name);
-        var existName = await  nameQuery.AnyAsync();
+        var nameQuery = _dbContext.Products.Where
+            (x => x.Name.Trim().ToLower() == productRequest.Name.Trim().ToLower());
+        var existName = await nameQuery.AnyAsync();
         if (existName)
-        {
+        {   
             throw new Exception("Product name already exists");
         }
-        var sellerQuery =  _dbContext.Products.Where(x => x.SellerId == productRequest.SellerId);
-        var existSeller = await sellerQuery.AnyAsync();
-        if (!existSeller)
+        var sellerQuery = _dbContext.Products.Where(x => x.SellerId == productRequest.SellerId);
+        var exitSeller = await sellerQuery.AnyAsync();
+        if (!exitSeller)
         {
             throw new Exception("Seller not found");
         }
+
         var newProduct = new Repository.Entity.Product()
         {
             Name = productRequest.Name,
+            SellerId = productRequest.SellerId,
             Price = productRequest.Price,
-            SellerId = productRequest.SellerId
         };
         _dbContext.Add(newProduct);
         await _dbContext.SaveChangesAsync();
-        if (productRequest.CategoryIds != null && productRequest.CategoryIds.Count > 0)
+        if (productRequest.CategoryId != null && productRequest.CategoryId.Count > 0)
         {
-            var productCateList = productRequest.CategoryIds.Select(x => new Repository.Entity.ProductCategory()
+            var productCateList = productRequest.CategoryId.Select(x => new Repository.Entity.ProductCategory()
             {
                 CategoryId = x,
                 ProductId = newProduct.Id
@@ -45,4 +47,15 @@ public class Service: IService
 
         return Response.Message.Created;
     }
+
+    public Task<string> UpdateProduct(Request.ProductRequest productRequest)
+    {
+        throw new NotImplementedException();
+    }
 }
+//Flow create Product
+//1. Check name có exist không
+//2. Check seller có exist không
+//3. Tạo mới Product -> add -> saveChange
+//4. Check CategoryIds có tồn tại không -> nếu có thì -> map sang ProductCategory -> CategoryId = Id | ProductId = request.Id
+//5. => map sang rồi AddRange -> SaveChange
